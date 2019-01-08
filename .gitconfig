@@ -1,0 +1,12 @@
+[alias]
+    b = branch
+    ci = commit
+    co = checkout
+    st = status
+    hist = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+    
+[user]
+	name = Chenxu Jiang
+	email = chj028@ucsd.edu
+[core]
+	editor = /usr/bin/vim
