@@ -1,4 +1,4 @@
-targetDir = ~/testCreate
+targetDir = ~
 dirs = $(shell find . -not -regex ".*/\.git/?.*" -type d)
 revDirs = $(shell find . -not -regex ".*/\.git/?.*" -type d | tac)
 suffix = mybackup
