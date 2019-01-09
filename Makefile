@@ -1,11 +1,10 @@
-targetDir = ~
-dirs = $(shell find . -not -regex ".*/\.git/?.*" -type d)
-revDirs = $(shell find . -not -regex ".*/\.git/?.*" -type d | tac)
+targetDir = $$HOME/testCreate
 suffix = mybackup
 backupOpt = --backup=simple --suffix=.$(suffix)
 
 install:
-	@for dir in $(dirs); do \
+	@cd src; \
+	for dir in `find . -type d`; do \
 		echo Creating directory $(targetDir)/$$dir; \
 		install -m 755 -d $(targetDir)/$$dir; \
 		for file in `find $$dir -maxdepth 1 -type f`; do \
@@ -14,10 +13,10 @@ install:
 		done; \
 		echo ""; \
 	done; \
-	rm $(targetDir)/Makefile
 
 uninstall:
-	@for dir in $(revDirs); do \
+	@cd src; \
+	for dir in `find . -type d | tac`; do \
 		for file in `find $$dir -maxdepth 1 -type f`; do \
 			if [ -f $(targetDir)/$$file ]; then \
 				echo Removing $(targetDir)/$$file; \
