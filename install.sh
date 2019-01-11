@@ -1,22 +1,6 @@
 #!/bin/sh
 set -e
 
-#   * experimental
-DEFAULT_CHANNEL_VALUE="edge"
-if [ -z "$CHANNEL" ]; then
-	CHANNEL=$DEFAULT_CHANNEL_VALUE
-fi
-
-DEFAULT_DOWNLOAD_URL="https://download.docker.com"
-if [ -z "$DOWNLOAD_URL" ]; then
-	DOWNLOAD_URL=$DEFAULT_DOWNLOAD_URL
-fi
-
-DEFAULT_REPO_FILE="docker-ce.repo"
-if [ -z "$REPO_FILE" ]; then
-	REPO_FILE="$DEFAULT_REPO_FILE"
-fi
-
 command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
@@ -73,22 +57,29 @@ do_install_pkg() {
 			(
 				set -x
 				$sh_c 'apt-get update -qq >/dev/null'
-				$sh_c "apt-get install -y -qq $pkgs >/dev/null"
+        for pkg in $pkgs; do
+				  $sh_c "apt-get install -y -qq $pkg >/dev/null"
+        done
 			)
 			;;
     fedora)
 			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree gcc golang python2 python3 nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
 			(
 				set -x
-				$sh_c "dnf install -y -q $pkgs"
+        for pkg in $pkgs; do
+				  $sh_c "dnf install -y -q $pkg"
+        done
 			)
+      ;;
 		*) # assume rhel or centos
       url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$lsb_ver.noarch.rpm"
 			pkgs="coreutils wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
 			(
 				set -x
         $sh_c "yum install -y -q $url"
-				$sh_c "yum install -y -q $pkgs"
+        for pkg in $pkgs; do
+				  $sh_c "yum install -y -q $pkg"
+        done
         $sh_c "if [ ! -e /usr/bin/vim ] && [ -e /usr/bin/vi] ; then ln -s /usr/bin/vi /usr/bin/vim; done;"
 			)
 			;;
@@ -98,6 +89,7 @@ do_install_pkg() {
 do_install_dotfiles() {
   hash=$(date +%s | sha256sum | head -c 8)
   installDir="/tmp/myworkspace_$hash"
+  echo $installDir
   mkdir -p $installDir
   if ! git clone "https://github.com/i2i2i2/dotfiles" $installDir; then
     exit 1
