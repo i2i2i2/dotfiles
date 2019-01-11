@@ -80,7 +80,7 @@ do_install_pkg() {
         for pkg in $pkgs; do
 				  $sh_c "yum install -y -q $pkg"
         done
-        $sh_c "if [ ! -e /usr/bin/vim ] && [ -e /usr/bin/vi] ; then ln -s /usr/bin/vi /usr/bin/vim; done;"
+        $sh_c "if [ ! -e /usr/bin/vim ] && [ -e /usr/bin/vi] ; then ln -s /usr/bin/vi /usr/bin/vim; fi;"
 			)
 			;;
 	esac
