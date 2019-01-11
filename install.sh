@@ -53,7 +53,7 @@ do_install_pkg() {
 	# Run setup for each distro accordingly
 	case "$lsb_dist" in
 		ubuntu|debian|raspbian)
-			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree g++ golang python python3 nodejs iproute2 netcat tcpdump net-tools traceroute iptables iputils-ping"
+			pkgs="apt-utils coreutils wget curl tmux vim mosh fish git psmisc tree g++ golang python python3 nodejs iproute2 netcat tcpdump net-tools traceroute iptables iputils-ping"
 			(
 				set -x
 				$sh_c 'apt-get update -qq >/dev/null'
@@ -73,7 +73,7 @@ do_install_pkg() {
       ;;
 		*) # assume rhel or centos
       url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$lsb_ver.noarch.rpm"
-			pkgs="coreutils wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+			pkgs="yum-utils coreutils wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
 			(
 				set -x
         $sh_c "yum install -y -q $url"
