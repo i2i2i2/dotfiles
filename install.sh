@@ -63,7 +63,7 @@ do_install_pkg() {
 			)
 			;;
     fedora)
-			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree gcc golang python2 python3 nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+			pkgs="coreutils wget curl tmux vim mosh fish git psmisc findutils tree gcc golang python2 python3 nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
 			(
 				set -x
         for pkg in $pkgs; do
@@ -75,15 +75,13 @@ do_install_pkg() {
       url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$lsb_ver.noarch.rpm"
 			pkgs="yum-utils coreutils vim-enhanced which wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
       (
-        set -x
-        $sh_c "yum install -y -q $url"
-      )
-			(
 				set -x
+        if ! yum list installed epel-release ; then
+          $sh_c "yum install -y -q $url"
+        fi
         for pkg in $pkgs; do
 				  $sh_c "yum install -y -q $pkg"
         done
-        $sh_c "if [ ! -e /usr/bin/vim ] && [ -e /usr/bin/vi] ; then ln -s /usr/bin/vi /usr/bin/vim; fi;"
 			)
 			;;
 	esac
