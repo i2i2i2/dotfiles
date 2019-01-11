@@ -73,10 +73,13 @@ do_install_pkg() {
       ;;
 		*) # assume rhel or centos
       url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$lsb_ver.noarch.rpm"
-			pkgs="yum-utils coreutils wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+			pkgs="yum-utils coreutils which wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+      (
+        set -x
+        $sh_c "yum install -y -q $url"
+      )
 			(
 				set -x
-        $sh_c "yum install -y -q $url"
         for pkg in $pkgs; do
 				  $sh_c "yum install -y -q $pkg"
         done
