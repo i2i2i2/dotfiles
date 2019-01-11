@@ -1,4 +1,6 @@
 set history=500
+set t_Co=256
+set fdm=indent
 
 " Enable filetype plugins
 filetype plugin on
