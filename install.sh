@@ -32,6 +32,17 @@ get_distribution() {
 	echo "$lsb_dist"
 }
 
+get_version() {
+	lsb_ver=""
+	# Every system that we officially support has /etc/os-release
+	if [ -r /etc/os-release ]; then
+		lsb_ver="$(. /etc/os-release && echo "$VERSION_ID")"
+	fi
+	# Returning an empty string here should be alright since the
+	# case statements don't act unless you provide an actual value
+	echo "$lsb_ver"
+}
+
 do_install_pkg() {
 	user="$(id -un 2>/dev/null || true)"
 
@@ -53,34 +64,63 @@ do_install_pkg() {
 	# perform some very rudimentary platform detection
 	lsb_dist=$( get_distribution )
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+  lsb_ver=$( get_version )
 
 	# Run setup for each distro accordingly
 	case "$lsb_dist" in
 		ubuntu|debian|raspbian)
-			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree g++ golang python python3 default-jdk nodejs iproute2 netcat tcpdump net-tools traceroute iptables iputils-ping"
+			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree g++ golang python python3 nodejs iproute2 netcat tcpdump net-tools traceroute iptables iputils-ping"
 			(
 				set -x
 				$sh_c 'apt-get update -qq >/dev/null'
 				$sh_c "apt-get install -y -qq $pkgs >/dev/null"
 			)
 			;;
-		*)
-			if [ "$lsb_dist" = "fedora" ]; then
-				pkg_manager="dnf"
-			else
-				pkg_manager="yum"
-			fi
-			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree gcc golang python3 java-openjdk nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+    fedora)
+			pkgs="coreutils wget curl tmux vim mosh fish git psmisc tree gcc golang python2 python3 nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
 			(
 				set -x
-				$sh_c "$pkg_manager install -y -q $pkgs"
+				$sh_c "dnf install -y -q $pkgs"
+			)
+		*) # assume rhel or centos
+      url="https://dl.fedoraproject.org/pub/epel/epel-release-latest-$lsb_ver.noarch.rpm"
+			pkgs="coreutils wget curl tmux mosh fish git psmisc tree gcc golang python nodejs iproute nmap-ncat tcpdump net-tools traceroute iptables iputils"
+			(
+				set -x
+        $sh_c "yum install -y -q $url"
+				$sh_c "yum install -y -q $pkgs"
+        $sh_c "if [ ! -e /usr/bin/vim ] && [ -e /usr/bin/vi] ; then ln -s /usr/bin/vi /usr/bin/vim; done;"
 			)
 			;;
 	esac
 }
 
 do_install_dotfiles() {
+  hash=$(date +%s | sha256sum | head -c 8)
+  installDir="/tmp/myworkspace_$hash"
+  mkdir -p $installDir
+  if ! git clone "https://github.com/i2i2i2/dotfiles" $installDir; then
+    exit 1
+  fi
 
+  backupOpt="--backup=simple --suffix=.mybackup"
+  (
+    set -x
+    cd $installDir/src
+    for dir in `find . -type d`; do
+      install -m 755 -d $HOME/$dir;
+      for file in `find $dir -maxdepth 1 -type f`; do
+        install -m 644 $backupOpt $file $HOME/$dir
+      done
+    done;
+  )
+  rm -rf $installDir
+  exit 0
+}
+
+do_install() {
+  do_install_pkg
+  do_install_dotfiles
 }
 
 # wrapped up in a function so that we have some protection against only getting
