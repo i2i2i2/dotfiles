@@ -1,6 +1,8 @@
 set history=500
 set t_Co=256
 set fdm=indent
+set autochdir
+set tags=./tags;,tags;
 
 " Enable filetype plugins
 filetype plugin on
@@ -207,6 +209,7 @@ let g:airline_powerline_fonts = 0
 nmap <C-o> :NERDTreeToggle<CR>
 nmap <Tab> :bn<CR>
 nmap <C-x> :bd<CR>
+nmap <C-f> <C-]>
 
 fun! CleanExtraSpaces()
   let save_cursor = getpos(".")
