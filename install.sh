@@ -112,7 +112,7 @@ do_install_dotfiles() {
 }
 
 do_install() {
-	do_install_pkg
+	# do_install_pkg
 	do_install_dotfiles
 }
 
